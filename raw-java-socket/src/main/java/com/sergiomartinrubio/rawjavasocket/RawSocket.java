@@ -20,8 +20,8 @@ public class RawSocket {
 
 
         while (true) {
-            Socket server = serverSocket.accept();
 
+            Socket server = serverSocket.accept();
             threadPool.execute(() -> {
                 try {
                     BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
