@@ -11,12 +11,12 @@ import java.util.concurrent.Executors;
 
 public class RawSocket {
 
-    private static final int PORT_NUMBER = 8081;
+    private static final int PORT_NUMBER = 8082;
 
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
 
-        ExecutorService threadPool = Executors.newCachedThreadPool();
+        ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
 
         while (true) {
@@ -28,7 +28,8 @@ public class RawSocket {
                     OutputStream out = server.getOutputStream();
                     in.lines().forEach(line -> {
                         try {
-                            out.write(("Echo: " + line.toUpperCase() + "\n").getBytes());
+                            System.out.println(line);
+                            out.write(("Echo: " + line + " - on THREAD " + Thread.currentThread().getId() +"\n").getBytes());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
