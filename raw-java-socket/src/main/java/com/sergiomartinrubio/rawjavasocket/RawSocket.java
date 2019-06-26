@@ -13,22 +13,24 @@ public class RawSocket {
 
     private static final int PORT_NUMBER = 8082;
 
+    private static int counter = 0;
+
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(3);
+        ExecutorService threadPool = Executors.newFixedThreadPool(40);
 
 
         while (true) {
 
             Socket server = serverSocket.accept();
             threadPool.execute(() -> {
+                System.out.println("Socket: " + counter++ + " on thread: " + Thread.currentThread().getId());
                 try {
                     BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
                     OutputStream out = server.getOutputStream();
                     in.lines().forEach(line -> {
                         try {
-                            System.out.println(line);
                             out.write(("Echo: " + line + " - on THREAD " + Thread.currentThread().getId() +"\n").getBytes());
                         } catch (IOException e) {
                             e.printStackTrace();
