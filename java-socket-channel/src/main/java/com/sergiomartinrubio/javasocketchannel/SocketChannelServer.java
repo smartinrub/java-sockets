@@ -1,10 +1,9 @@
 package com.sergiomartinrubio.javasocketchannel;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.channels.*;
 
 /**
  * http://tutorials.jenkov.com/java-nio/scatter-gather.html
@@ -12,24 +11,38 @@ import java.nio.file.Paths;
 public class SocketChannelServer {
 
     public static void main(String[] args) throws IOException {
-        Path path = Paths.get("nio-data.txt");
-        FileChannel inChannel = FileChannel.open(path);
 
-//create buffer with capacity of 48 bytes
-        ByteBuffer buf = ByteBuffer.allocate(1024);
+        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+        serverSocketChannel.socket().bind(new InetSocketAddress(8080));
+        serverSocketChannel.configureBlocking(false);
 
-        int bytesRead = inChannel.read(buf); //read into buffer.
-        while (bytesRead != -1) {
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        buffer.clear();
 
-            buf.flip();  //make buffer ready for read
+//        Selector selector = Selector.open();
+//        SelectionKey key = serverSocketChannel.register(selector, SelectionKey.OP_READ);
 
-            while(buf.hasRemaining()){
-                System.out.print((char) buf.get()); // read 1 byte at a time
+
+        while (true) {
+            SocketChannel socketChannel = serverSocketChannel.accept();
+
+            if (socketChannel != null) {
+                int read = socketChannel.read(buffer); // pos = 12 & lim = 1024
+
+                while (read != -1) {
+
+                    buffer.flip(); // set buffer in read mode - pos = 0 & lim = 12
+
+                    while(buffer.hasRemaining()){
+                        System.out.print((char) buffer.get()); // read 1 byte at a time
+                    }
+
+                    buffer.clear(); // make buffer ready for writing - pos = 0 & lim = 1024
+                    read = socketChannel.read(buffer); // set to -1
+                }
+
             }
-
-            buf.clear(); //make buffer ready for writing
-            bytesRead = inChannel.read(buf);
         }
-        inChannel.close();
+
     }
 }
