@@ -10,6 +10,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>raw-java-socket</module>
+        <module>java-socket-channel</module>
     </modules>
 
 </project>
