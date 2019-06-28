@@ -43,7 +43,7 @@ public class SocketChannelWithSelectorServer {
 
                     dataMap.put(socketChannel, buffer);
                     System.out.println("Total clients connected: " + dataMap.size());
-                    socketChannel.register(selector, SelectionKey.OP_READ);
+                    socketChannel.register(selectionKey.selector(), SelectionKey.OP_READ);
                 } else if (selectionKey.isReadable()) {
                     System.out.println("Reading...");
                     var socketChannel = (SocketChannel) selectionKey.channel();
@@ -61,7 +61,7 @@ public class SocketChannelWithSelectorServer {
 
                     pendingData.flip();
                     dataMap.put(socketChannel, pendingData);
-                    socketChannel.register(selector, SelectionKey.OP_WRITE); // set mode to WRITE to send data
+                    socketChannel.register(selectionKey.selector(), SelectionKey.OP_WRITE); // set mode to WRITE to send data
                 } else if (selectionKey.isWritable()) {
                     System.out.println("Writing...");
                     var socketChannel = (SocketChannel) selectionKey.channel();
@@ -71,7 +71,7 @@ public class SocketChannelWithSelectorServer {
                     }
                     pendingData.clear();
                     socketChannel.read(pendingData);
-                    socketChannel.register(selector, SelectionKey.OP_READ);
+                    selectionKey.interestOps(SelectionKey.OP_READ); // change the key to READ
                 }
                 keys.remove();
             }
