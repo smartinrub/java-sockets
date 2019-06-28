@@ -61,7 +61,7 @@ public class SocketChannelWithSelectorServer {
 
                     pendingData.flip();
                     dataMap.put(socketChannel, pendingData);
-                    socketChannel.register(selectionKey.selector(), SelectionKey.OP_WRITE); // set mode to WRITE to send data
+                    selectionKey.interestOps(SelectionKey.OP_WRITE); // set mode to WRITE to send data
                 } else if (selectionKey.isWritable()) {
                     System.out.println("Writing...");
                     var socketChannel = (SocketChannel) selectionKey.channel();
