@@ -15,8 +15,8 @@ import java.util.Queue;
 public class SocketChannelWithSelectorServer {
 
     public static void main(String[] args) throws IOException {
-        Map<SocketChannel, Queue<ByteBuffer>> dataMap = new HashMap<>();;
 
+        Map<SocketChannel, Queue<ByteBuffer>> dataMap = new HashMap<>();
         var selector = Selector.open();
 
         // Create Server Socket Channel
