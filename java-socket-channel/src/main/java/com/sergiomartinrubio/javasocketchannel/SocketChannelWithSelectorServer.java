@@ -66,13 +66,8 @@ public class SocketChannelWithSelectorServer {
                     var socketChannel = (SocketChannel) selectionKey.channel();
                     var pendingData = dataMap.get(socketChannel);
                     while (!pendingData.isEmpty()) {
-                        var buf = pendingData.peek();
+                        var buf = pendingData.poll();
                         socketChannel.write(buf);
-                        if (buf.hasRemaining()) {
-                            return;
-                        } else {
-                            pendingData.remove();
-                        }
                     }
                     selectionKey.interestOps(SelectionKey.OP_READ); // change the key to READ
                 }
