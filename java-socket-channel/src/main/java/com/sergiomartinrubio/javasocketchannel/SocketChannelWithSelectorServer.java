@@ -23,7 +23,7 @@ public class SocketChannelWithSelectorServer {
         serverSocketChannel.socket().bind(new InetSocketAddress(8080));
 
         // Register channel to selector to accept requests
-        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT); // selector pointing to ACCEPT operation
 
         while (true) {
             selector.select();
@@ -33,7 +33,7 @@ public class SocketChannelWithSelectorServer {
                 var selectionKey = (SelectionKey) keys.next();
 
                 if (selectionKey.isAcceptable()) {
-                    var buffer = ByteBuffer.allocate(10000);
+                    var buffer = ByteBuffer.allocate(1024);
                     var socketChannel = serverSocketChannel.accept();
                     System.out.println("Accepted connection from " + socketChannel);
                     socketChannel.configureBlocking(false);
@@ -41,9 +41,9 @@ public class SocketChannelWithSelectorServer {
                     socketChannel.write(ByteBuffer.wrap(("Welcome: " + socketChannel.getRemoteAddress() +
                             "\nThe thread assigned to you is: " + Thread.currentThread().getId() + "\n").getBytes()));
 
-                    dataMap.put(socketChannel, buffer);
+                    dataMap.put(socketChannel, buffer); // store socket connection
                     System.out.println("Total clients connected: " + dataMap.size());
-                    socketChannel.register(selectionKey.selector(), SelectionKey.OP_READ);
+                    socketChannel.register(selectionKey.selector(), SelectionKey.OP_READ); // selector pointing to READ operation
                 } else if (selectionKey.isReadable()) {
                     System.out.println("Reading...");
                     var socketChannel = (SocketChannel) selectionKey.channel();
