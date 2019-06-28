@@ -64,8 +64,8 @@ public class SocketChannelWithSelectorServer {
                 } else if (selectionKey.isWritable()) {
                     System.out.println("Writing...");
                     var socketChannel = (SocketChannel) selectionKey.channel();
-                    var pendingData = dataMap.get(socketChannel);
-                    while (!pendingData.isEmpty()) {
+                    var pendingData = dataMap.get(socketChannel); // find channel in queue
+                    while (!pendingData.isEmpty()) { // start sending to client from queue
                         var buf = pendingData.poll();
                         socketChannel.write(buf);
                     }
