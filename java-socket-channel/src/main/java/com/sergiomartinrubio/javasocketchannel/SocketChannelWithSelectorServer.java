@@ -57,10 +57,11 @@ public class SocketChannelWithSelectorServer {
                         System.out.println("Connection closed by client: " + remoteSocketAddress);
                         socketChannel.close();
                         selectionKey.cancel();
+                    } else {
+                        byteBuffer.flip();
+                        dataMap.get(socketChannel).add(byteBuffer); // find socket channel to retrieve pending data if any
+                        selectionKey.interestOps(SelectionKey.OP_WRITE); // set mode to WRITE to send data
                     }
-                    byteBuffer.flip();
-                    dataMap.get(socketChannel).add(byteBuffer); // find socket channel to retrieve pending data if any
-                    selectionKey.interestOps(SelectionKey.OP_WRITE); // set mode to WRITE to send data
                 } else if (selectionKey.isWritable()) {
                     System.out.println("Writing...");
                     var socketChannel = (SocketChannel) selectionKey.channel();
