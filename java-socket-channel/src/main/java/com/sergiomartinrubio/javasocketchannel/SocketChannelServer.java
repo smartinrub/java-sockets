@@ -3,7 +3,8 @@ package com.sergiomartinrubio.javasocketchannel;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.*;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 
 /**
  * http://tutorials.jenkov.com/java-nio/scatter-gather.html
@@ -18,10 +19,6 @@ public class SocketChannelServer {
 
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         buffer.clear();
-
-//        Selector selector = Selector.open();
-//        SelectionKey key = serverSocketChannel.register(selector, SelectionKey.OP_READ);
-
 
         while (true) {
             SocketChannel socketChannel = serverSocketChannel.accept();
@@ -40,9 +37,7 @@ public class SocketChannelServer {
                     buffer.clear(); // make buffer ready for writing - pos = 0 & lim = 1024
                     read = socketChannel.read(buffer); // set to -1
                 }
-
             }
         }
-
     }
 }

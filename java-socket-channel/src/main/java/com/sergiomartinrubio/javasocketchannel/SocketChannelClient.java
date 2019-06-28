@@ -8,8 +8,8 @@ import java.nio.channels.SocketChannel;
 public class SocketChannelClient {
 
     public static void main(String[] args) throws IOException {
-        SocketChannel socketChannel = SocketChannel.open();
-        socketChannel.connect(new InetSocketAddress("localhost", 8080));
+        SocketChannel client = SocketChannel.open();
+        client.connect(new InetSocketAddress("localhost", 8080));
 
 
         String data = "Hello World\n";
@@ -21,7 +21,17 @@ public class SocketChannelClient {
         buffer.flip();
 
         while (buffer.hasRemaining()) {
-            socketChannel.write(buffer);
+            client.write(buffer);
         }
+
+        buffer.flip();
+
+        StringBuilder read = new StringBuilder();
+        while (client.read(buffer) != -1) {
+            read.append(new String(buffer.array()).trim());
+            buffer.clear();
+        }
+
+        System.out.println(read);
     }
 }

@@ -12,19 +12,19 @@ public class SocketTestClient {
 
     public static void main(String[] args) throws IOException {
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(100);
-        Socket[] sockets = new Socket[100];
+        ExecutorService threadPool = Executors.newFixedThreadPool(1);
+        Socket[] sockets = new Socket[1];
 
         for (int i = 0; i < sockets.length; i++) {
 
             int index = i;
             threadPool.execute(() -> {
                 try {
-                    sockets[index] = new Socket("localhost", 8082);
+                    sockets[index] = new Socket("localhost", 8080);
                     PrintWriter out = new PrintWriter(sockets[index].getOutputStream(), true);
                     BufferedReader in = new BufferedReader(new InputStreamReader(sockets[index].getInputStream()));
                     String fromServer;
-                    out.println("hello");
+                    out.println("hello world");
                     while ((fromServer = in.readLine()) != null) {
                         System.out.println(fromServer);
                     }
