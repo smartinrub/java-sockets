@@ -12,28 +12,29 @@ public class SocketTestClient {
 
     public static void main(String[] args) throws IOException {
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(5);
-        Socket[] sockets = new Socket[10];
-
+        Socket[] sockets = new Socket[1000];
         for (int i = 0; i < sockets.length; i++) {
-
-            int index = i;
-            threadPool.execute(() -> {
-                try {
-                    sockets[index] = new Socket("localhost", 8080);
-                    PrintWriter out = new PrintWriter(sockets[index].getOutputStream(), true);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(sockets[index].getInputStream()));
-                    String fromServer;
-                    out.println("hello world");
-                    while ((fromServer = in.readLine()) != null) {
-                        System.out.println(fromServer);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+            sockets[i] = new Socket("localhost", 8080);
         }
 
-    }
+        ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
+        while (true) {
+            for (Socket socket: sockets) {
+                threadPool.execute(() -> {
+                    try {
+                        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                        String fromServer;
+                        out.println("hello world");
+                        while ((fromServer = in.readLine()) != null) {
+                            System.out.println(fromServer);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        }
+    }
 }
