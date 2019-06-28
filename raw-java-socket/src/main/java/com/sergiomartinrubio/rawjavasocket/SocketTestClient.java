@@ -12,8 +12,8 @@ public class SocketTestClient {
 
     public static void main(String[] args) throws IOException {
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(1);
-        Socket[] sockets = new Socket[1];
+        ExecutorService threadPool = Executors.newFixedThreadPool(5);
+        Socket[] sockets = new Socket[10];
 
         for (int i = 0; i < sockets.length; i++) {
 

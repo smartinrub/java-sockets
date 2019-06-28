@@ -40,9 +40,11 @@ public class SocketChannelWithSelectorServer {
                     System.out.println("Accepted connection from " + socketChannel);
                     socketChannel.configureBlocking(false);
 
-                    socketChannel.write(ByteBuffer.wrap("You are hitting Socket Channel Echo Server!\n".getBytes()));
+                    socketChannel.write(ByteBuffer.wrap(("Welcome: " + socketChannel.getRemoteAddress() +
+                            "\nThe thread assigned to you is: " + Thread.currentThread().getId() + "\n").getBytes()));
 
                     dataMap.put(socketChannel, buffer);
+                    System.out.println("Total clients connected: " + dataMap.size());
                     socketChannel.register(selector, SelectionKey.OP_READ);
                 } else if (selectionKey.isReadable()) {
                     System.out.println("Reading...");
