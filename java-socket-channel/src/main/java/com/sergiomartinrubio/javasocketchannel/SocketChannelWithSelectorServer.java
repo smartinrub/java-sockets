@@ -8,12 +8,14 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 public class SocketChannelWithSelectorServer {
 
     public static void main(String[] args) throws IOException {
-        Map<SocketChannel, ByteBuffer> dataMap = new HashMap<>();;
+        Map<SocketChannel, Queue<ByteBuffer>> dataMap = new HashMap<>();;
 
         var selector = Selector.open();
 
@@ -33,7 +35,6 @@ public class SocketChannelWithSelectorServer {
                 var selectionKey = (SelectionKey) keys.next();
 
                 if (selectionKey.isAcceptable()) {
-                    var buffer = ByteBuffer.allocate(1024);
                     var socketChannel = serverSocketChannel.accept();
                     System.out.println("Accepted connection from " + socketChannel);
                     socketChannel.configureBlocking(false);
@@ -41,15 +42,14 @@ public class SocketChannelWithSelectorServer {
                     socketChannel.write(ByteBuffer.wrap(("Welcome: " + socketChannel.getRemoteAddress() +
                             "\nThe thread assigned to you is: " + Thread.currentThread().getId() + "\n").getBytes()));
 
-                    dataMap.put(socketChannel, buffer); // store socket connection
+                    dataMap.put(socketChannel, new LinkedList<>()); // store socket connection
                     System.out.println("Total clients connected: " + dataMap.size());
                     socketChannel.register(selectionKey.selector(), SelectionKey.OP_READ); // selector pointing to READ operation
                 } else if (selectionKey.isReadable()) {
                     System.out.println("Reading...");
                     var socketChannel = (SocketChannel) selectionKey.channel();
-                    var pendingData = dataMap.get(socketChannel); // find socket channel to retrieve pending data if any
-                    int read = socketChannel.read(pendingData);
-
+                    var byteBuffer = ByteBuffer.allocate(1024);
+                    int read = socketChannel.read(byteBuffer);
                     if (read == -1) {
                         dataMap.remove(socketChannel);
                         var socket = socketChannel.socket();
@@ -58,19 +58,22 @@ public class SocketChannelWithSelectorServer {
                         socketChannel.close();
                         selectionKey.cancel();
                     }
-
-                    pendingData.flip();
-                    dataMap.put(socketChannel, pendingData);
+                    byteBuffer.flip();
+                    dataMap.get(socketChannel).add(byteBuffer); // find socket channel to retrieve pending data if any
                     selectionKey.interestOps(SelectionKey.OP_WRITE); // set mode to WRITE to send data
                 } else if (selectionKey.isWritable()) {
                     System.out.println("Writing...");
                     var socketChannel = (SocketChannel) selectionKey.channel();
                     var pendingData = dataMap.get(socketChannel);
-                    while (pendingData.hasRemaining()) {
-                        socketChannel.write(pendingData); // sends all data at once
+                    while (!pendingData.isEmpty()) {
+                        var buf = pendingData.peek();
+                        socketChannel.write(buf);
+                        if (buf.hasRemaining()) {
+                            return;
+                        } else {
+                            pendingData.remove();
+                        }
                     }
-                    pendingData.clear();
-                    socketChannel.read(pendingData);
                     selectionKey.interestOps(SelectionKey.OP_READ); // change the key to READ
                 }
                 keys.remove();
