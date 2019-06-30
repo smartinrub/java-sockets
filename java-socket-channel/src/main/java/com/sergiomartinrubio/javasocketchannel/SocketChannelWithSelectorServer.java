@@ -48,9 +48,9 @@ public class SocketChannelWithSelectorServer {
                 } else if (selectionKey.isReadable()) {
                     System.out.println("Reading...");
                     var socketChannel = (SocketChannel) selectionKey.channel();
-                    var byteBuffer = ByteBuffer.allocate(1024);
-                    int read = socketChannel.read(byteBuffer);
-                    if (read == -1) {
+                    var byteBuffer = ByteBuffer.allocate(1024); // pos=0 & lim=1024
+                    int read = socketChannel.read(byteBuffer); // pos=numberOfBytes & lim=1024
+                    if (read == -1) { // if connection is closed by the client
                         dataMap.remove(socketChannel);
                         var socket = socketChannel.socket();
                         var remoteSocketAddress = socket.getRemoteSocketAddress();
@@ -58,14 +58,14 @@ public class SocketChannelWithSelectorServer {
                         socketChannel.close();
                         selectionKey.cancel();
                     } else {
-                        byteBuffer.flip();
-                        dataMap.get(socketChannel).add(byteBuffer); // find socket channel to retrieve pending data if any
+                        byteBuffer.flip(); // put buffer in read mode by setting pos=0 and lim=numberOfBytes
+                        dataMap.get(socketChannel).add(byteBuffer); // find socket channel and add new byteBuffer queue
                         selectionKey.interestOps(SelectionKey.OP_WRITE); // set mode to WRITE to send data
                     }
                 } else if (selectionKey.isWritable()) {
                     System.out.println("Writing...");
                     var socketChannel = (SocketChannel) selectionKey.channel();
-                    var pendingData = dataMap.get(socketChannel); // find channel in queue
+                    var pendingData = dataMap.get(socketChannel); // find channel
                     while (!pendingData.isEmpty()) { // start sending to client from queue
                         var buf = pendingData.poll();
                         socketChannel.write(buf);

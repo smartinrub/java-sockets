@@ -24,11 +24,11 @@ public class SocketChannelServer {
             SocketChannel socketChannel = serverSocketChannel.accept();
 
             if (socketChannel != null) {
-                int read = socketChannel.read(buffer); // pos = 12 & lim = 1024
+                int read = socketChannel.read(buffer); // pos = n & lim = 1024
 
                 while (read != -1) {
 
-                    buffer.flip(); // set buffer in read mode - pos = 0 & lim = 12
+                    buffer.flip(); // set buffer in read mode - pos = 0 & lim = n
 
                     while(buffer.hasRemaining()){
                         System.out.print((char) buffer.get()); // read 1 byte at a time
