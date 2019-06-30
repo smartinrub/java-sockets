@@ -20,11 +20,11 @@ public class SocketChannelWithSelectorServer {
     private static Map<SocketChannel, Queue<ByteBuffer>> dataMap = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
-        var selector = Selector.open();
-
         var serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.socket().bind(new InetSocketAddress(8080));
+
+        var selector = Selector.open();
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 
         while (true) {
