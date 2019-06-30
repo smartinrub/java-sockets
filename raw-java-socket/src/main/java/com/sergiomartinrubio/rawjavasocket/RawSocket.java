@@ -23,12 +23,12 @@ public class RawSocket {
 
         while (true) {
 
-            Socket server = serverSocket.accept();
+            Socket client = serverSocket.accept();
             threadPool.execute(() -> {
                 System.out.println("Socket: " + counter++ + " on thread: " + Thread.currentThread().getId());
                 try {
-                    BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
-                    OutputStream out = server.getOutputStream();
+                    BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                    OutputStream out = client.getOutputStream();
                     in.lines().forEach(line -> {
                         try {
                             out.write(("Echo: " + line + " - on THREAD " + Thread.currentThread().getId() +"\n").getBytes());
@@ -36,7 +36,7 @@ public class RawSocket {
                             e.printStackTrace();
                         }
                     });
-                    server.close();
+                    client.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
