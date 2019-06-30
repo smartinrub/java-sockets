@@ -22,13 +22,10 @@ public class SocketChannelWithSelectorServer {
     public static void main(String[] args) throws IOException {
         var selector = Selector.open();
 
-        // Create Server Socket Channel
         var serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.socket().bind(new InetSocketAddress(8080));
-
-        // Register channel to selector to accept requests
-        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT); // selector pointing to ACCEPT operation
+        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 
         while (true) {
             selector.select();
