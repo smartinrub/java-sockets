@@ -11,6 +11,7 @@
     <modules>
         <module>raw-java-socket</module>
         <module>java-socket-channel</module>
+        <module>socket-channel-chat</module>
     </modules>
 
 </project>
